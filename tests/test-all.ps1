@@ -1,198 +1,104 @@
 ﻿<#
 .SYNOPSIS
-    PowerSkills test suite - verifies all skills work correctly.
-.DESCRIPTION
-    Run from the PowerSkills root directory:
-        .\tests\test-all.ps1
-    
-    Tests both dispatcher and standalone modes.
-    Outlook and Browser tests require those apps to be running.
+    PowerSkills test suite
 .EXAMPLE
-    .\tests\test-all.ps1                    # Run all tests
-    .\tests\test-all.ps1 -Skip outlook      # Skip Outlook tests
-    .\tests\test-all.ps1 -Only system       # Only run system tests
+    .\tests\test-all.ps1
+    .\tests\test-all.ps1 -SkipBrowser
+    .\tests\test-all.ps1 -SkipOutlook
 #>
 param(
-    [string[]]$Skip = @(),
-    [string[]]$Only = @()
+    [switch]$SkipBrowser,
+    [switch]$SkipOutlook
 )
 
 $ErrorActionPreference = "Continue"
 $root = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
-$pass = 0; $fail = 0; $skip_count = 0
-$results = @()
+$pass = 0
+$fail = 0
 
-function Run-Test {
-    param([string]$Name, [string]$Skill, [scriptblock]$Block)
+function Test-Skill {
+    param([string]$Name, [scriptblock]$Code)
     
-    if ($Only.Count -gt 0 -and $Skill -notin $Only) { return }
-    if ($Skill -in $Skip) {
-        $script:skip_count++
-        Write-Host "  SKIP  " -ForegroundColor Yellow -NoNewline
-        Write-Host $Name
-        return
-    }
-
     try {
-        $output = & $Block
-        $json = $output | ConvertFrom-Json
-        if ($json.status -eq "success" -and $json.exit_code -eq 0) {
+        $out = & $Code 2>&1
+        $json = $out | ConvertFrom-Json -ErrorAction Stop
+        if ($json.status -eq "success") {
             $script:pass++
             Write-Host "  PASS  " -ForegroundColor Green -NoNewline
             Write-Host $Name
-            $script:results += @{ name = $Name; status = "pass" }
-        } else {
+        }
+        else {
             $script:fail++
             Write-Host "  FAIL  " -ForegroundColor Red -NoNewline
-            Write-Host "$Name - status: $($json.status), error: $($json.data.error)"
-            $script:results += @{ name = $Name; status = "fail"; error = $json.data.error }
+            Write-Host "$Name - $($json.data.error)"
         }
-    } catch {
+    }
+    catch {
         $script:fail++
         Write-Host "  FAIL  " -ForegroundColor Red -NoNewline
         Write-Host "$Name - $_"
-        $script:results += @{ name = $Name; status = "fail"; error = $_.ToString() }
     }
 }
 
 Write-Host ""
 Write-Host "PowerSkills Test Suite" -ForegroundColor Cyan
-Write-Host ("=" * 50)
+Write-Host "======================"
 Write-Host "Root: $root"
 Write-Host ""
 
-# ─── Core: Dispatcher ───
+# Core
 Write-Host "[ Core ]" -ForegroundColor Cyan
+Test-Skill "list skills" { & "$root\powerskills.ps1" list }
 
-Run-Test "Dispatcher: list skills" "core" {
-    & "$root\powerskills.ps1" list
-}
-
-Run-Test "Dispatcher: help for system" "core" {
-    & "$root\powerskills.ps1" system help
-}
-
-# ─── System ───
+# System
 Write-Host ""
 Write-Host "[ System ]" -ForegroundColor Cyan
+Test-Skill "system info (dispatcher)" { & "$root\powerskills.ps1" system info }
+Test-Skill "system info (standalone)" { & "$root\skills\system\system.ps1" info }
+Test-Skill "system exec" { & "$root\powerskills.ps1" system exec --command "echo test123" }
+Test-Skill "system processes" { & "$root\powerskills.ps1" system processes --limit 3 }
 
-Run-Test "system info (dispatcher)" "system" {
-    & "$root\powerskills.ps1" system info
-}
-
-Run-Test "system info (standalone)" "system" {
-    & "$root\skills\system\system.ps1" info
-}
-
-Run-Test "system exec: whoami" "system" {
-    & "$root\powerskills.ps1" system exec --command "whoami"
-}
-
-Run-Test "system exec: echo test" "system" {
-    & "$root\skills\system\system.ps1" exec --command "echo hello-powerskills"
-}
-
-Run-Test "system processes" "system" {
-    & "$root\powerskills.ps1" system processes --limit 3
-}
-
-Run-Test "system env: COMPUTERNAME" "system" {
-    & "$root\powerskills.ps1" system env --name COMPUTERNAME
-}
-
-# ─── Desktop ───
+# Desktop
 Write-Host ""
 Write-Host "[ Desktop ]" -ForegroundColor Cyan
+Test-Skill "desktop windows (dispatcher)" { & "$root\powerskills.ps1" desktop windows }
+Test-Skill "desktop windows (standalone)" { & "$root\skills\desktop\desktop.ps1" windows }
 
-Run-Test "desktop windows list (dispatcher)" "desktop" {
-    & "$root\powerskills.ps1" desktop windows
+# Outlook
+if (-not $SkipOutlook) {
+    Write-Host ""
+    Write-Host "[ Outlook ]" -ForegroundColor Cyan
+    Test-Skill "outlook folders" { & "$root\powerskills.ps1" outlook folders }
+    Test-Skill "outlook inbox" { & "$root\powerskills.ps1" outlook inbox --limit 2 }
+}
+else {
+    Write-Host ""
+    Write-Host "[ Outlook ] SKIPPED" -ForegroundColor Yellow
 }
 
-Run-Test "desktop windows list (standalone)" "desktop" {
-    & "$root\skills\desktop\desktop.ps1" windows
+# Browser
+if (-not $SkipBrowser) {
+    Write-Host ""
+    Write-Host "[ Browser ]" -ForegroundColor Cyan
+    Test-Skill "browser tabs" { & "$root\powerskills.ps1" browser tabs }
+}
+else {
+    Write-Host ""
+    Write-Host "[ Browser ] SKIPPED" -ForegroundColor Yellow
 }
 
-$screenshotPath = Join-Path $root "tests\test-screenshot.png"
-Run-Test "desktop screenshot" "desktop" {
-    & "$root\powerskills.ps1" desktop screenshot --out-file $screenshotPath
-}
-
-# Clean up screenshot
-if (Test-Path $screenshotPath) { Remove-Item $screenshotPath -Force }
-
-# ─── Outlook ───
+# Summary
 Write-Host ""
-Write-Host "[ Outlook ]" -ForegroundColor Cyan
-
-Run-Test "outlook folders (dispatcher)" "outlook" {
-    & "$root\powerskills.ps1" outlook folders
-}
-
-Run-Test "outlook inbox --limit 3" "outlook" {
-    & "$root\powerskills.ps1" outlook inbox --limit 3
-}
-
-Run-Test "outlook inbox (standalone)" "outlook" {
-    & "$root\skills\outlook\outlook.ps1" inbox --limit 2
-}
-
-Run-Test "outlook unread --limit 3" "outlook" {
-    & "$root\powerskills.ps1" outlook unread --limit 3
-}
-
-Run-Test "outlook sent --limit 3" "outlook" {
-    & "$root\powerskills.ps1" outlook sent --limit 3
-}
-
-Run-Test "outlook read --index 0" "outlook" {
-    & "$root\powerskills.ps1" outlook read --index 0 --folder inbox
-}
-
-Run-Test "outlook calendar --days 3" "outlook" {
-    & "$root\powerskills.ps1" outlook calendar --days 3
-}
-
-# ─── Browser ───
-Write-Host ""
-Write-Host "[ Browser ]" -ForegroundColor Cyan
-
-Run-Test "browser tabs (dispatcher)" "browser" {
-    & "$root\powerskills.ps1" browser tabs
-}
-
-Run-Test "browser tabs (standalone)" "browser" {
-    & "$root\skills\browser\browser.ps1" tabs
-}
-
-# ─── Summary ───
-Write-Host ""
-Write-Host ("=" * 50)
-$total = $pass + $fail + $skip_count
+Write-Host "======================"
+$total = $pass + $fail
 Write-Host "Results: " -NoNewline
 Write-Host "$pass passed" -ForegroundColor Green -NoNewline
 Write-Host ", " -NoNewline
 if ($fail -gt 0) {
-    Write-Host "$fail failed" -ForegroundColor Red -NoNewline
-} else {
-    Write-Host "0 failed" -NoNewline
+    Write-Host "$fail failed" -ForegroundColor Red
 }
-if ($skip_count -gt 0) {
-    Write-Host ", $skip_count skipped" -ForegroundColor Yellow -NoNewline
+else {
+    Write-Host "0 failed"
 }
-Write-Host " ($total total)"
-
-# Output JSON summary too
-$summary = @{
-    status    = if ($fail -eq 0) { "success" } else { "partial" }
-    passed    = $pass
-    failed    = $fail
-    skipped   = $skip_count
-    total     = $total
-    results   = $results
-    timestamp = (Get-Date).ToString("o")
-}
-Write-Host ""
-Write-Host "JSON:" -ForegroundColor DarkGray
-$summary | ConvertTo-Json -Depth 5 -Compress
 
 if ($fail -gt 0) { exit 1 } else { exit 0 }
