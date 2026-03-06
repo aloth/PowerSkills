@@ -97,7 +97,7 @@ Edit `config.json`:
 
 Each skill has a `SKILL.md` with action documentation. Point your agent to `skills/<name>/SKILL.md` for structured capability discovery.
 
-### OpenClaw Integration
+### Agent Integration
 
 Add to your skills directory or reference directly:
 
