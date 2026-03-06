@@ -1,6 +1,11 @@
 ---
 name: powerskills-browser
 description: Edge browser automation via Chrome DevTools Protocol (CDP). List tabs, navigate, take screenshots, extract page content/HTML, execute JavaScript, click elements, type text, fill forms, scroll. Use when needing to control Edge browser, scrape web content, automate web forms, or take browser screenshots on Windows. Requires Edge with --remote-debugging-port=9222.
+license: MIT
+metadata:
+  author: aloth
+  cli: powerskills
+  parent: powerskills
 ---
 
 # PowerSkills — Browser

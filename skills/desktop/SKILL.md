@@ -1,6 +1,11 @@
 ---
 name: powerskills-desktop
 description: Windows desktop automation. Take full-screen or window screenshots, list/focus/minimize/maximize windows, send keystrokes, launch applications. Use when needing to capture the Windows screen, manage windows, send keyboard input, or start programs.
+license: MIT
+metadata:
+  author: aloth
+  cli: powerskills
+  parent: powerskills
 ---
 
 # PowerSkills — Desktop

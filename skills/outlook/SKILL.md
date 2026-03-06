@@ -1,6 +1,11 @@
 ---
 name: powerskills-outlook
 description: Outlook email and calendar automation via COM. Read inbox, unread, sent items. Search emails. Send, reply, draft. List calendar events and mail folders. Use when needing to check work email, read/send Outlook messages, search mail, or view calendar. Requires Outlook desktop app on Windows.
+license: MIT
+metadata:
+  author: aloth
+  cli: powerskills
+  parent: powerskills
 ---
 
 # PowerSkills — Outlook

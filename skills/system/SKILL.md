@@ -1,6 +1,11 @@
 ---
 name: powerskills-system
 description: Windows system commands and info via PowerShell. Execute shell commands, get system info (hostname, OS, uptime), list top processes, read environment variables. Use when needing to run commands, check system status, or inspect the Windows environment.
+license: MIT
+metadata:
+  author: aloth
+  cli: powerskills
+  parent: powerskills
 ---
 
 # PowerSkills — System

@@ -1,6 +1,10 @@
 ---
 name: powerskills
 description: Windows automation toolkit for AI agents. Provides Outlook email/calendar, Edge browser (CDP), desktop screenshots/window management, and shell commands via PowerShell. Install this for the full suite, or install individual sub-skills (powerskills-outlook, powerskills-browser, powerskills-desktop, powerskills-system) separately.
+license: MIT
+metadata:
+  author: aloth
+  cli: powerskills
 ---
 
 # PowerSkills
