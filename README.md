@@ -61,6 +61,18 @@ Or run one-off with bypass:
 powershell -ExecutionPolicy Bypass -File .\powerskills.ps1 list
 ```
 
+## Standalone Skills
+
+Each skill can be called directly without `powerskills.ps1`:
+
+```powershell
+.\skills\outlook\outlook.ps1 inbox --limit 5
+.\skills\system\system.ps1 info
+.\skills\browser\browser.ps1 tabs
+```
+
+Standalone mode uses `lib\bootstrap.ps1` for arg parsing and JSON output.
+
 ### Edge CDP Setup
 
 ```powershell
