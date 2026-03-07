@@ -1,5 +1,11 @@
 # PowerSkills
 
+[![License: MIT](https://img.shields.io/github/license/aloth/PowerSkills)](https://github.com/aloth/PowerSkills/blob/main/LICENSE)
+[![Release](https://img.shields.io/github/v/release/aloth/PowerSkills)](https://github.com/aloth/PowerSkills/releases)
+[![PowerShell 5.1+](https://img.shields.io/badge/PowerShell-5.1%2B-blue?logo=powershell&logoColor=white)](https://docs.microsoft.com/en-us/powershell/)
+[![Windows](https://img.shields.io/badge/Windows-10%2F11-0078D6?logo=windows&logoColor=white)](https://github.com/aloth/PowerSkills)
+[![Stars](https://img.shields.io/github/stars/aloth/PowerSkills)](https://github.com/aloth/PowerSkills/stargazers)
+
 ![PowerSkills Hero](assets/powerskills-ai-agents-windows-powershell-automation.jpg)
 
 Windows capabilities for AI agents — Outlook, Edge browser, desktop automation, and shell commands as structured JSON skills.
@@ -115,21 +121,29 @@ skills:
 
 ```
 PowerSkills/
-├── powerskills.ps1      # CLI entry point
-├── config.json          # Configuration
+├── powerskills.ps1          # CLI entry point / dispatcher
+├── config.json              # Configuration
+├── lib/
+│   └── bootstrap.ps1        # Shared arg parsing & JSON output helpers
+├── assets/
+│   └── powerskills-ai-agents-windows-powershell-automation.jpg
 ├── skills/
 │   ├── outlook/
-│   │   ├── SKILL.md
-│   │   └── outlook.ps1
+│   │   ├── SKILL.md         # Agent-readable skill documentation
+│   │   └── outlook.ps1      # Outlook COM automation
 │   ├── browser/
 │   │   ├── SKILL.md
-│   │   └── browser.ps1
+│   │   └── browser.ps1      # Edge CDP automation
 │   ├── desktop/
 │   │   ├── SKILL.md
-│   │   └── desktop.ps1
+│   │   └── desktop.ps1      # Win32 window/screenshot/clipboard
 │   └── system/
 │       ├── SKILL.md
-│       └── system.ps1
+│       └── system.ps1       # System info, processes, exec
+├── tests/
+│   └── test-all.ps1         # Test suite (-SkipBrowser, -SkipOutlook)
+├── SKILL.md                 # Root skill metadata
+├── LICENSE                  # MIT
 └── README.md
 ```
 
