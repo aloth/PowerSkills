@@ -147,6 +147,22 @@ PowerSkills/
 └── README.md
 ```
 
+## Contributing
+
+Contributions are welcome! Here's how you can help:
+
+- **Report bugs** - open an [issue](https://github.com/aloth/PowerSkills/issues) with the Bug Report template
+- **Request features** - suggest new actions or skills via [Feature Request](https://github.com/aloth/PowerSkills/issues)
+- **Add a skill** - create a new folder under `skills/` with a `.ps1` and `SKILL.md`
+- **Improve existing skills** - better error handling, new actions, documentation fixes
+- **Join the discussion** - share ideas in [Discussions](https://github.com/aloth/PowerSkills/discussions)
+
+When adding or modifying skills, please follow the existing patterns:
+1. Use `lib\bootstrap.ps1` for arg parsing and JSON output
+2. Return results via `Write-SkillResult` / `Write-SkillError`
+3. Include a `SKILL.md` with action documentation
+4. Test both dispatcher and standalone modes
+
 ## License
 
 MIT
