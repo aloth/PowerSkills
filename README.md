@@ -10,6 +10,14 @@
 
 Windows capabilities for AI agents — Outlook, Edge browser, desktop automation, and shell commands as structured JSON skills.
 
+## Installation
+
+```
+git clone https://github.com/aloth/PowerSkills
+```
+
+Each skill has a `SKILL.md` for self-discovery. No dependencies required.
+
 ## Quick Start
 
 ```powershell
