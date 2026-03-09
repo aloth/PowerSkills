@@ -5,6 +5,7 @@
 [![PowerShell 5.1+](https://img.shields.io/badge/PowerShell-5.1%2B-blue?logo=powershell&logoColor=white)](https://docs.microsoft.com/en-us/powershell/)
 [![Windows](https://img.shields.io/badge/Windows-10%2F11-0078D6?logo=windows&logoColor=white)](https://github.com/aloth/PowerSkills)
 [![Stars](https://img.shields.io/github/stars/aloth/PowerSkills)](https://github.com/aloth/PowerSkills/stargazers)
+[![AgentSkills](https://img.shields.io/badge/AgentSkills-compatible-blue)](https://agentskills.io)
 
 ![PowerSkills Hero](assets/powerskills-ai-agents-windows-powershell-automation.jpg)
 
@@ -17,6 +18,12 @@ git clone https://github.com/aloth/PowerSkills
 ```
 
 Each skill has a `SKILL.md` for self-discovery. No dependencies required.
+
+### For AI agents (via AgentSkills)
+
+```bash
+npx skills add aloth/PowerSkills
+```
 
 ## Quick Start
 
