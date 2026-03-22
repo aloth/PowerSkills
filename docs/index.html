@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PowerSkills — Windows Automation Toolkit for AI Agents</title>
+<meta name="description" content="Give your AI agent Windows superpowers. Outlook email, Edge browser, desktop control, and shell commands via structured JSON. PowerShell 5.1+, no dependencies.">
+<meta property="og:title" content="PowerSkills — Windows for AI Agents">
+<meta property="og:description" content="Outlook, Edge, desktop, and shell automation as structured JSON skills for any LLM agent.">
+<meta property="og:image" content="https://raw.githubusercontent.com/aloth/PowerSkills/main/assets/powerskills-ai-agents-windows-powershell-automation.jpg">
+<meta property="og:url" content="https://aloth.github.io/PowerSkills/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0f;--surface:#12121a;--border:#1e1e2e;--blue:#0078D6;--cyan:#61dafb;--purple:#a78bfa;--green:#4ade80;--yellow:#fbbf24;--red:#f87171;--text:#e8e8ed;--muted:#8888a0;--dimmed:#4a4a5e}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 24px 50px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:1000px;height:600px;background:radial-gradient(ellipse,rgba(0,120,214,0.12) 0%,rgba(161,139,250,0.06) 40%,transparent 70%);pointer-events:none}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:6px 16px;font-size:13px;font-weight:500;color:var(--muted);margin-bottom:28px}
+.hero-badge .pulse{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.hero h1{font-size:clamp(2.2rem,7vw,4rem);font-weight:800;line-height:1.08;margin-bottom:20px;letter-spacing:-0.03em}
+.hero h1 .win{background:linear-gradient(135deg,var(--blue),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{font-size:clamp(1rem,2.5vw,1.25rem);color:var(--muted);max-width:560px;line-height:1.6;margin-bottom:36px}
+.hero-img{max-width:min(680px,90vw);width:100%;border-radius:14px;box-shadow:0 24px 80px rgba(0,0,0,0.5);border:1px solid var(--border);margin-bottom:36px}
+.hero-cta{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 26px;border-radius:9px;font-weight:600;font-size:0.95rem;text-decoration:none;transition:transform 0.2s}
+.btn:hover{transform:translateY(-2px)}
+.btn-blue{background:var(--blue);color:#fff;box-shadow:0 4px 20px rgba(0,120,214,0.35)}
+.btn-ghost{background:rgba(255,255,255,0.06);color:var(--text);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--muted)}
+.btn svg{width:18px;height:18px;fill:currentColor}
+
+/* Skills grid */
+.skills{padding:100px 24px}
+.skills h2{text-align:center;font-size:clamp(1.5rem,4vw,2.2rem);font-weight:800;margin-bottom:12px}
+.skills .subtitle{text-align:center;color:var(--muted);margin-bottom:56px;max-width:520px;margin-left:auto;margin-right:auto}
+.skill-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;max-width:960px;margin:0 auto}
+.skill-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px 22px;transition:border-color 0.25s,transform 0.2s}
+.skill-card:hover{border-color:var(--blue);transform:translateY(-3px)}
+.skill-icon{font-size:36px;margin-bottom:14px}
+.skill-card h3{font-size:1.05rem;font-weight:700;margin-bottom:4px}
+.skill-card .cmd{font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--cyan);margin-bottom:10px}
+.skill-card p{color:var(--muted);font-size:0.88rem;line-height:1.5}
+.skill-card ul{list-style:none;margin-top:10px}
+.skill-card li{font-size:0.82rem;color:var(--dimmed);padding:3px 0}
+.skill-card li::before{content:'→ ';color:var(--blue)}
+
+/* JSON demo */
+.demo{padding:80px 24px}
+.demo h2{text-align:center;font-size:clamp(1.5rem,4vw,2.2rem);font-weight:800;margin-bottom:12px}
+.demo .subtitle{text-align:center;color:var(--muted);margin-bottom:40px;max-width:480px;margin-left:auto;margin-right:auto}
+.demo-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;max-width:900px;margin:0 auto}
+.json-block{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.json-label{background:#1a1a26;padding:10px 16px;font-size:12px;font-weight:600;color:var(--dimmed);font-family:'JetBrains Mono',monospace;display:flex;align-items:center;gap:8px}
+.json-label .arrow{color:var(--green);font-size:14px}
+.json-label .arrow.out{color:var(--cyan)}
+.json-body{padding:18px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.7;overflow-x:auto}
+.json-body .key{color:var(--purple)}
+.json-body .str{color:var(--green)}
+.json-body .num{color:var(--yellow)}
+.json-body .bool{color:var(--cyan)}
+.json-body .bracket{color:var(--dimmed)}
+.json-body .comment{color:var(--dimmed);font-style:italic}
+
+/* Architecture */
+.arch{padding:80px 24px;text-align:center}
+.arch h2{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:800;margin-bottom:40px}
+.arch-flow{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;max-width:800px;margin:0 auto}
+.arch-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 24px;min-width:140px}
+.arch-box .icon{font-size:28px;margin-bottom:8px}
+.arch-box .name{font-weight:700;font-size:0.9rem}
+.arch-box .sub{color:var(--muted);font-size:0.75rem;margin-top:4px}
+.arch-arrow{color:var(--dimmed);font-size:24px}
+
+/* Compat */
+.compat{padding:60px 24px}
+.compat h2{text-align:center;font-size:clamp(1.3rem,3vw,1.8rem);font-weight:800;margin-bottom:12px}
+.compat .subtitle{text-align:center;color:var(--muted);margin-bottom:36px}
+.compat-logos{display:flex;gap:20px;justify-content:center;flex-wrap:wrap}
+.compat-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 24px;font-weight:600;font-size:0.9rem;color:var(--muted)}
+
+/* Install */
+.install{padding:60px 24px}
+.install h2{text-align:center;font-size:clamp(1.3rem,3vw,1.8rem);font-weight:800;margin-bottom:32px}
+.install-options{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;max-width:600px;margin:0 auto}
+.install-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 24px;flex:1;min-width:240px;cursor:pointer;transition:border-color 0.2s}
+.install-card:hover{border-color:var(--blue)}
+.install-card .label{font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--dimmed);font-weight:600;margin-bottom:8px}
+.install-card code{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--cyan)}
+
+/* CTA */
+.cta{padding:80px 24px;text-align:center;position:relative}
+.cta::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent)}
+.cta h2{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:800;margin-bottom:12px}
+.cta p{color:var(--muted);font-size:1rem;margin-bottom:8px}
+.cta .reqs{color:var(--dimmed);font-size:0.85rem;margin-bottom:32px}
+.cta-buttons{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+
+footer{border-top:1px solid var(--border);padding:24px;text-align:center;color:var(--dimmed);font-size:0.85rem}
+footer a{color:var(--muted);text-decoration:none}
+
+@media(max-width:600px){
+  .arch-flow{flex-direction:column}
+  .arch-arrow{transform:rotate(90deg)}
+  .json-body{font-size:10px}
+}
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-badge"><span class="pulse"></span> AgentSkills Compatible</div>
+  <h1>Give your AI agent<br><span class="win">Windows superpowers.</span></h1>
+  <p>Outlook, Edge browser, desktop control, and shell commands. Structured JSON in, structured JSON out. Works with any LLM agent framework.</p>
+  <img src="https://raw.githubusercontent.com/aloth/PowerSkills/main/assets/powerskills-ai-agents-windows-powershell-automation.jpg" alt="PowerSkills AI agent Windows automation" class="hero-img" loading="eager">
+  <div class="hero-cta">
+    <a href="https://github.com/aloth/PowerSkills" class="btn btn-blue">
+      <svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      Get PowerSkills
+    </a>
+    <a href="#skills" class="btn btn-ghost">See all skills ↓</a>
+  </div>
+</section>
+
+<section class="skills" id="skills">
+  <h2>Four skill modules</h2>
+  <p class="subtitle">Each module exposes Windows capabilities as simple JSON-in, JSON-out commands.</p>
+  <div class="skill-grid">
+    <div class="skill-card">
+      <div class="skill-icon">📧</div>
+      <h3>Outlook</h3>
+      <div class="cmd">powerskills outlook</div>
+      <p>Full email and calendar control via Outlook COM automation.</p>
+      <ul>
+        <li>Read inbox, search, filter</li>
+        <li>Send emails with attachments</li>
+        <li>Calendar events & meetings</li>
+        <li>Folder management</li>
+      </ul>
+    </div>
+    <div class="skill-card">
+      <div class="skill-icon">🌐</div>
+      <h3>Browser</h3>
+      <div class="cmd">powerskills browser</div>
+      <p>Edge automation via Chrome DevTools Protocol (CDP).</p>
+      <ul>
+        <li>List & switch tabs</li>
+        <li>Navigate, click, type</li>
+        <li>Extract page content</li>
+        <li>Take screenshots</li>
+      </ul>
+    </div>
+    <div class="skill-card">
+      <div class="skill-icon">🖥️</div>
+      <h3>Desktop</h3>
+      <div class="cmd">powerskills desktop</div>
+      <p>Visual desktop control and window management.</p>
+      <ul>
+        <li>Screenshots (full/window)</li>
+        <li>Window list & focus</li>
+        <li>Keystroke injection</li>
+        <li>Mouse control</li>
+      </ul>
+    </div>
+    <div class="skill-card">
+      <div class="skill-icon">⚙️</div>
+      <h3>System</h3>
+      <div class="cmd">powerskills system</div>
+      <p>Shell commands, processes, and system information.</p>
+      <ul>
+        <li>Execute shell commands</li>
+        <li>Process management</li>
+        <li>System info & health</li>
+        <li>File operations</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="demo">
+  <h2>Structured JSON everywhere</h2>
+  <p class="subtitle">Every command returns a consistent envelope. No string parsing, no regex gymnastics.</p>
+  <div class="demo-grid">
+    <div class="json-block">
+      <div class="json-label"><span class="arrow">▶</span> Request</div>
+      <div class="json-body">
+<span class="bracket">{</span><br>
+&nbsp;&nbsp;<span class="key">"skill"</span>: <span class="str">"outlook"</span>,<br>
+&nbsp;&nbsp;<span class="key">"action"</span>: <span class="str">"inbox"</span>,<br>
+&nbsp;&nbsp;<span class="key">"limit"</span>: <span class="num">3</span>,<br>
+&nbsp;&nbsp;<span class="key">"unread_only"</span>: <span class="bool">true</span><br>
+<span class="bracket">}</span>
+      </div>
+    </div>
+    <div class="json-block">
+      <div class="json-label"><span class="arrow out">◀</span> Response</div>
+      <div class="json-body">
+<span class="bracket">{</span><br>
+&nbsp;&nbsp;<span class="key">"status"</span>: <span class="str">"success"</span>,<br>
+&nbsp;&nbsp;<span class="key">"exit_code"</span>: <span class="num">0</span>,<br>
+&nbsp;&nbsp;<span class="key">"data"</span>: <span class="bracket">{</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="key">"messages"</span>: <span class="bracket">[</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="bracket">{</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="key">"subject"</span>: <span class="str">"Q1 Review"</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="key">"from"</span>: <span class="str">"boss@corp.com"</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="key">"date"</span>: <span class="str">"2026-03-22"</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="bracket">}</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="bracket">]</span><br>
+&nbsp;&nbsp;<span class="bracket">}</span><br>
+<span class="bracket">}</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="arch">
+  <h2>How it works</h2>
+  <div class="arch-flow">
+    <div class="arch-box">
+      <div class="icon">🤖</div>
+      <div class="name">AI Agent</div>
+      <div class="sub">Any LLM framework</div>
+    </div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-box" style="border-color:var(--blue)">
+      <div class="icon">⚡</div>
+      <div class="name">PowerSkills</div>
+      <div class="sub">PowerShell 5.1+</div>
+    </div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-box">
+      <div class="icon">🪟</div>
+      <div class="name">Windows</div>
+      <div class="sub">COM / CDP / Shell</div>
+    </div>
+  </div>
+</section>
+
+<section class="compat">
+  <h2>Works with any agent framework</h2>
+  <p class="subtitle">Standard JSON interface. No vendor lock-in.</p>
+  <div class="compat-logos">
+    <div class="compat-item">🦎 OpenClaw</div>
+    <div class="compat-item">🔗 LangChain</div>
+    <div class="compat-item">🧠 AutoGPT</div>
+    <div class="compat-item">💬 ChatGPT</div>
+    <div class="compat-item">🤖 Claude</div>
+    <div class="compat-item">🔧 Custom Agents</div>
+  </div>
+</section>
+
+<section class="install">
+  <h2>Install in seconds</h2>
+  <div class="install-options">
+    <div class="install-card" onclick="navigator.clipboard.writeText('git clone https://github.com/aloth/PowerSkills')">
+      <div class="label">Git Clone</div>
+      <code>git clone https://github.com/aloth/PowerSkills</code>
+    </div>
+    <div class="install-card" onclick="navigator.clipboard.writeText('npx skills add aloth/PowerSkills')">
+      <div class="label">AgentSkills</div>
+      <code>npx skills add aloth/PowerSkills</code>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <h2>Automate Windows with AI</h2>
+  <p>Open source. Zero dependencies. MIT licensed.</p>
+  <p class="reqs">Requires Windows 10/11 · PowerShell 5.1+ · Outlook & Edge optional</p>
+  <div class="cta-buttons">
+    <a href="https://github.com/aloth/PowerSkills" class="btn btn-blue">
+      <svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      View on GitHub ⭐
+    </a>
+    <a href="https://github.com/aloth/PowerSkills/releases" class="btn btn-ghost">📦 Releases</a>
+  </div>
+</section>
+
+<footer>
+  <p>Made by <a href="https://alexloth.com">Alexander Loth</a> · MIT License</p>
+</footer>
+
+</body>
+</html>
