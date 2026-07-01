@@ -14,6 +14,7 @@ param(
 
 # ─── Standalone bootstrap ───
 $_standalone = (-not $Args_ -or $Args_.Count -eq 0) -and -not (Get-Variable -Name SkillsRoot -Scope Script -ErrorAction SilentlyContinue)
+$script:SkillDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 if ($_standalone) {
     . (Join-Path (Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path))) "lib\bootstrap.ps1")
     if ($Rest) { $Args_ = Parse-CliArgs -Arguments $Rest } else { $Args_ = @{} }
@@ -81,6 +82,18 @@ function Format-MailItemFull {
 
 # ─── Main logic ───
 function Invoke-OutlookAction {
+    # Help / list-actions do NOT need a COM connection.
+    if ($Action -eq "help" -or $Action -eq "" -or $Action -eq "list-actions") {
+        $skillMd = Join-Path $script:SkillDir "SKILL.md"
+        # Cast to [string] to strip PSObject NoteProperties that trip up ConvertTo-Json.
+        $help = if (Test-Path $skillMd) { [string](Get-Content $skillMd -Raw) } else { "" }
+        return @{
+            skill   = "outlook"
+            help    = $help
+            actions = @("inbox", "unread", "sent", "read", "search", "calendar", "send", "reply", "folders", "help", "list-actions")
+        }
+    }
+
     $ns = Get-OutlookNamespace
 
     switch ($Action) {
@@ -249,7 +262,7 @@ function Invoke-OutlookAction {
             return $result
         }
         default {
-            throw "Unknown action: $Action. Use: inbox, unread, sent, read, search, calendar, send, reply, folders"
+            throw "Unknown action: $Action. Use: inbox, unread, sent, read, search, calendar, send, reply, folders, help"
         }
     }
 }

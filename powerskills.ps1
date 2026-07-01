@@ -101,10 +101,13 @@ if ($Skill -eq "list") {
     Write-Result -Data $skills
 }
 # ─── Skill help ───
-elseif ($Action -eq "help" -or $Action -eq "") {
+elseif ($Action -eq "help" -or $Action -eq "" -or $Action -eq "list-actions") {
     $skillMd = Join-Path $script:SkillsRoot "$Skill\SKILL.md"
     if (Test-Path $skillMd) {
-        $content = Get-Content $skillMd -Raw
+        # Cast to [string] to strip PSObject NoteProperties that Get-Content -Raw
+        # attaches (PSPath, PSProvider, Drive, ...). Without this, ConvertTo-Json
+        # in Windows PowerShell 5.1 recurses into those properties and hangs.
+        $content = [string](Get-Content $skillMd -Raw)
         Write-Result -Data @{ skill = $Skill; help = $content }
     } else {
         Write-Error-Result "Unknown skill: $Skill. Run: .\powerskills.ps1 list"
