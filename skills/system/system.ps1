@@ -15,6 +15,7 @@ param(
 
 # ─── Standalone bootstrap ───
 $_standalone = (-not $Args_ -or $Args_.Count -eq 0) -and -not (Get-Variable -Name SkillsRoot -Scope Script -ErrorAction SilentlyContinue)
+$script:SkillDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 if ($_standalone) {
     . (Join-Path (Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path))) "lib\bootstrap.ps1")
     if ($Rest) { $Args_ = Parse-CliArgs -Arguments $Rest } else { $Args_ = @{} }
@@ -25,6 +26,17 @@ $defaultTimeout = if ($Config.default_timeout) { [int]$Config.default_timeout } 
 
 # ─── Main logic ───
 function Invoke-SystemAction {
+    # Help / list-actions do NOT need any system probing.
+    if ($Action -eq "help" -or $Action -eq "" -or $Action -eq "list-actions") {
+        $skillMd = Join-Path $script:SkillDir "SKILL.md"
+        $help = if (Test-Path $skillMd) { [string](Get-Content $skillMd -Raw) } else { "" }
+        return @{
+            skill   = "system"
+            help    = $help
+            actions = @("exec", "info", "processes", "env", "help", "list-actions")
+        }
+    }
+
     switch ($Action) {
         "exec" {
             $command = $Args_.command
@@ -79,7 +91,7 @@ function Invoke-SystemAction {
             return @{ name = $name; value = $val }
         }
         default {
-            throw "Unknown action: $Action. Use: exec, info, processes, env"
+            throw "Unknown action: $Action. Use: exec, info, processes, env, help"
         }
     }
 }

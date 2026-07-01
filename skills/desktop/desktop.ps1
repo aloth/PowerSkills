@@ -15,6 +15,7 @@ param(
 
 # ─── Standalone bootstrap ───
 $_standalone = (-not $Args_ -or $Args_.Count -eq 0) -and -not (Get-Variable -Name SkillsRoot -Scope Script -ErrorAction SilentlyContinue)
+$script:SkillDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 if ($_standalone) {
     . (Join-Path (Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path))) "lib\bootstrap.ps1")
     if ($Rest) { $Args_ = Parse-CliArgs -Arguments $Rest } else { $Args_ = @{} }
@@ -74,6 +75,17 @@ function Find-Window {
 
 # ─── Main logic ───
 function Invoke-DesktopAction {
+    # Help / list-actions do NOT need any Win32 or graphics setup.
+    if ($Action -eq "help" -or $Action -eq "" -or $Action -eq "list-actions") {
+        $skillMd = Join-Path $script:SkillDir "SKILL.md"
+        $help = if (Test-Path $skillMd) { [string](Get-Content $skillMd -Raw) } else { "" }
+        return @{
+            skill   = "desktop"
+            help    = $help
+            actions = @("screenshot", "windows", "focus", "minimize", "maximize", "keys", "launch", "help", "list-actions")
+        }
+    }
+
     switch ($Action) {
         "screenshot" {
             $outFile = $Args_.'out-file'
@@ -172,7 +184,7 @@ function Invoke-DesktopAction {
             return @{ launched = $Args_.app }
         }
         default {
-            throw "Unknown action: $Action. Use: screenshot, windows, focus, minimize, maximize, keys, launch"
+            throw "Unknown action: $Action. Use: screenshot, windows, focus, minimize, maximize, keys, launch, help"
         }
     }
 }

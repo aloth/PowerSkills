@@ -15,6 +15,7 @@ param(
 
 # ─── Standalone bootstrap ───
 $_standalone = (-not $Args_ -or $Args_.Count -eq 0) -and -not (Get-Variable -Name SkillsRoot -Scope Script -ErrorAction SilentlyContinue)
+$script:SkillDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 if ($_standalone) {
     . (Join-Path (Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path))) "lib\bootstrap.ps1")
     if ($Rest) { $Args_ = Parse-CliArgs -Arguments $Rest } else { $Args_ = @{} }
@@ -77,6 +78,17 @@ function Send-CDP {
 
 # ─── Main logic ───
 function Invoke-BrowserAction {
+    # Help / list-actions do NOT need a CDP connection.
+    if ($Action -eq "help" -or $Action -eq "" -or $Action -eq "list-actions") {
+        $skillMd = Join-Path $script:SkillDir "SKILL.md"
+        $help = if (Test-Path $skillMd) { [string](Get-Content $skillMd -Raw) } else { "" }
+        return @{
+            skill   = "browser"
+            help    = $help
+            actions = @("tabs", "navigate", "screenshot", "content", "html", "evaluate", "click", "type", "new-tab", "close-tab", "scroll", "fill", "wait", "help", "list-actions")
+        }
+    }
+
     switch ($Action) {
         "tabs" {
             $targets = Get-Targets
@@ -183,7 +195,7 @@ function Invoke-BrowserAction {
             return @{ waited = $seconds }
         }
         default {
-            throw "Unknown action: $Action. Use: tabs, navigate, screenshot, content, html, evaluate, click, type, new-tab, close-tab, scroll, fill, wait"
+            throw "Unknown action: $Action. Use: tabs, navigate, screenshot, content, html, evaluate, click, type, new-tab, close-tab, scroll, fill, wait, help"
         }
     }
 }
