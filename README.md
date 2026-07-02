@@ -39,6 +39,8 @@ npx skills add aloth/PowerSkills
 .\powerskills.ps1 browser tabs
 .\powerskills.ps1 desktop screenshot --out-file screen.png
 .\powerskills.ps1 system exec --command "whoami"
+.\powerskills.ps1 workiq check
+.\powerskills.ps1 workiq ask --question "What's on my calendar tomorrow?"
 ```
 
 ## Skills
@@ -46,6 +48,7 @@ npx skills add aloth/PowerSkills
 | Skill | Description |
 |-------|-------------|
 | `outlook` | Email & calendar via Outlook COM |
+| `workiq` | Microsoft 365 (mail/calendar/Teams/SharePoint/OneDrive) via [Work IQ](https://github.com/microsoft/work-iq) CLI |
 | `browser` | Edge automation via CDP (Chrome DevTools Protocol) |
 | `desktop` | Screenshots, window management, keystrokes |
 | `system` | Shell commands, processes, system info |
@@ -69,6 +72,7 @@ All commands return JSON with consistent envelope:
 - PowerShell 5.1+
 - Microsoft Outlook (for `outlook` skill)
 - Microsoft Edge with `--remote-debugging-port=9222` (for `browser` skill)
+- Node.js + npm (for `workiq install`; skip if you install Work IQ another way)
 
 ### Execution Policy
 
@@ -146,6 +150,9 @@ PowerSkills/
 │   ├── outlook/
 │   │   ├── SKILL.md         # Agent-readable skill documentation
 │   │   └── outlook.ps1      # Outlook COM automation
+│   ├── workiq/
+│   │   ├── SKILL.md
+│   │   └── workiq.ps1       # Microsoft 365 via Work IQ CLI
 │   ├── browser/
 │   │   ├── SKILL.md
 │   │   └── browser.ps1      # Edge CDP automation
@@ -156,7 +163,7 @@ PowerSkills/
 │       ├── SKILL.md
 │       └── system.ps1       # System info, processes, exec
 ├── tests/
-│   └── test-all.ps1         # Test suite (-SkipBrowser, -SkipOutlook)
+│   └── test-all.ps1         # Test suite (-SkipBrowser, -SkipOutlook, -SkipWorkIq)
 ├── SKILL.md                 # Root skill metadata
 ├── LICENSE                  # MIT
 └── README.md

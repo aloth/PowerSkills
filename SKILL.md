@@ -1,6 +1,6 @@
 ---
 name: powerskills
-description: Windows automation toolkit for AI agents. Provides Outlook email/calendar, Edge browser (CDP), desktop screenshots/window management, and shell commands via PowerShell. Install this for the full suite, or install individual sub-skills (powerskills-outlook, powerskills-browser, powerskills-desktop, powerskills-system) separately.
+description: Windows automation toolkit for AI agents. Provides Outlook email/calendar (COM), Microsoft 365 mail/calendar/Teams/SharePoint/OneDrive via Work IQ CLI, Edge browser (CDP), desktop screenshots/window management, and shell commands via PowerShell. Install this for the full suite, or install individual sub-skills (powerskills-outlook, powerskills-workiq, powerskills-browser, powerskills-desktop, powerskills-system) separately.
 license: MIT
 metadata:
   author: aloth
@@ -74,6 +74,7 @@ Edit `config.json`:
 | Skill | Description |
 |-------|-------------|
 | [outlook](skills/outlook/SKILL.md) | Email & calendar via Outlook COM |
+| [workiq](skills/workiq/SKILL.md) | Microsoft 365 (mail/calendar/Teams/SharePoint/OneDrive) via Work IQ CLI |
 | [browser](skills/browser/SKILL.md) | Edge automation via CDP |
 | [desktop](skills/desktop/SKILL.md) | Screenshots, window management, keystrokes |
 | [system](skills/system/SKILL.md) | Shell commands, processes, system info |

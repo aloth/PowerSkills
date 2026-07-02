@@ -1,6 +1,7 @@
 param(
     [switch]$SkipBrowser,
-    [switch]$SkipOutlook
+    [switch]$SkipOutlook,
+    [switch]$SkipWorkIq
 )
 
 $ErrorActionPreference = "Continue"
@@ -77,6 +78,21 @@ if (-not $SkipBrowser) {
 else {
     Write-Host ""
     Write-Host "[ Browser ] SKIPPED" -ForegroundColor Yellow
+}
+
+# Work IQ
+if (-not $SkipWorkIq) {
+    Write-Host ""
+    Write-Host "[ Work IQ ]" -ForegroundColor Cyan
+    Test-Skill "workiq help"      { & "$root\powerskills.ps1" workiq help }
+    Test-Skill "workiq check"     { & "$root\powerskills.ps1" workiq check }
+    Test-Skill "workiq version"   { & "$root\powerskills.ps1" workiq version }
+    Test-Skill "workiq version (standalone)" { & "$root\skills\workiq\workiq.ps1" version }
+    Test-Skill "workiq raw"       { & "$root\powerskills.ps1" workiq raw --args "version" }
+}
+else {
+    Write-Host ""
+    Write-Host "[ Work IQ ] SKIPPED" -ForegroundColor Yellow
 }
 
 # Summary
