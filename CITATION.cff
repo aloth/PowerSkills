@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+title: "PowerSkills: Windows Capabilities for AI Agents"
+message: "If you use PowerSkills in your work, please cite it as below."
+type: software
+authors:
+  - family-names: Loth
+    given-names: Alexander
+    orcid: "https://orcid.org/0009-0003-9327-6865"
+version: "0.2.0"
+date-released: "2026-07-02"
+license: MIT
+repository-code: "https://github.com/aloth/PowerSkills"
+url: "https://github.com/aloth/PowerSkills"
+abstract: >
+  A PowerShell toolkit exposing Windows and Microsoft 365 capabilities to AI agents as
+  structured JSON: mail, calendar, Teams, SharePoint and OneDrive through Work IQ and
+  Microsoft Graph, plus Outlook COM, Edge browser control over CDP, desktop automation
+  and shell commands. Each skill carries a SKILL.md for self-discovery.
+keywords:
+  - PowerShell
+  - AI agents
+  - Windows
+  - Microsoft 365
+  - Microsoft Graph
+  - automation
+  - agent skills
