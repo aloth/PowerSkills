@@ -1,5 +1,6 @@
 # PowerSkills
 
+[![CI](https://github.com/aloth/PowerSkills/actions/workflows/ci.yml/badge.svg)](https://github.com/aloth/PowerSkills/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/github/license/aloth/PowerSkills)](https://github.com/aloth/PowerSkills/blob/main/LICENSE)
 [![Release](https://img.shields.io/github/v/release/aloth/PowerSkills)](https://github.com/aloth/PowerSkills/releases)
 [![PowerShell 5.1+](https://img.shields.io/badge/PowerShell-5.1%2B-blue?logo=powershell&logoColor=white)](https://docs.microsoft.com/en-us/powershell/)
@@ -10,6 +11,8 @@
 ![PowerSkills Hero](assets/powerskills-ai-agents-windows-powershell-automation.jpg)
 
 Windows capabilities for AI agents — Outlook, Edge browser, desktop automation, and shell commands as structured JSON skills.
+
+> **If PowerSkills saves you time, please star the repository** so other people building agents on Windows find it. To reference it in a paper, see [Citation](#citation).
 
 ## Installation
 
@@ -184,6 +187,20 @@ When adding or modifying skills, please follow the existing patterns:
 2. Return results via `Write-SkillResult` / `Write-SkillError`
 3. Include a `SKILL.md` with action documentation
 4. Test both dispatcher and standalone modes
+
+## Citation
+
+If you use PowerSkills in your work, please cite it. GitHub's "Cite this repository" button in the sidebar gives the reference in APA and BibTeX, from [CITATION.cff](CITATION.cff):
+
+```bibtex
+@software{loth2026powerskills,
+    author  = {Loth, Alexander},
+    title   = {{PowerSkills}: Windows Capabilities for AI Agents},
+    year    = {2026},
+    version = {0.2.0},
+    url     = {https://github.com/aloth/PowerSkills}
+}
+```
 
 ## License
 

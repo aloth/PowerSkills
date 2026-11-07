@@ -1,0 +1,43 @@
+name: CI
+
+# Runs on pull requests and on pushes to main. Nothing here publishes.
+#
+# Outlook, the browser (Edge over CDP) and Work IQ need a signed-in desktop
+# session and are skipped; tests/test-all.ps1 then covers the dispatcher, the
+# system skill and the desktop skill on a real Windows host.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # README promises Windows PowerShell 5.1; pwsh is PowerShell 7.
+        shell: [powershell, pwsh]
+    defaults:
+      run:
+        shell: ${{ matrix.shell }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Script analysis (errors only)
+        if: matrix.shell == 'pwsh'
+        run: |
+          Install-Module PSScriptAnalyzer -Scope CurrentUser -Force
+          $issues = Invoke-ScriptAnalyzer -Path . -Recurse -Severity Error
+          $issues | Format-Table -AutoSize
+          if ($issues) { exit 1 }
+
+      - name: Test suite
+        run: ./tests/test-all.ps1 -SkipOutlook -SkipBrowser -SkipWorkIq
